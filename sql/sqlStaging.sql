@@ -17,22 +17,26 @@ SELECT
 FROM SiteRaw;
 
 INSERT OR REPLACE INTO Species
-SELECT DISTINCT
-    json_extract_string(sp, '$."@SpeciesCode"') AS SpCode,
-    json_extract_string(sp, '$."@SpeciesDescription"') AS SpDescription,
-FROM ( SELECT unnest(from_json(
-    CASE WHEN json_type(json_extract(site, '$.Species')) = 'OBJECT'
-         THEN json_array(json_extract(site, '$.Species'))
-         ELSE json_extract(site, '$.Species') END,
-    '["JSON"]'
-)) AS sp FROM SiteRaw);
+SELECT 
+    sp."@SpeciesCode" AS SpCode, 
+    sp."@SpeciesName" AS SpName,
+    sp."@Description" AS SpDescription,
+    sp."@HealthEffect" AS SpHealthEffect,
+FROM SpeciesRaw AS sp;
 
---PLACEHOLDER
-INSERT OR REPLACE INTO AirQualityBand (AQBand, AQLowerBound, AQUpperBound) VALUES
-    ('Low',       1,  3),
-    ('Moderate',  4,  6),
-    ('High',      7,  9),
-    ('Very High', 10, 10);
+INSERT OR REPLACE INTO AirQualityBand 
+SELECT 
+    aq."@AirQualityBand" AS AQBand,
+    CAST(aq."@LowerAirQualityIndex" AS INTEGER) AS AQLowerBound,
+    CAST(aq."@UpperAirQualityIndex" AS INTEGER) AS AQUpperBound
+FROM AirQualityBandRaw AS aq;
+
+INSERT OR REPLACE INTO Advice
+SELECT
+    a."@AirQualityBand" AS AQBand,
+    a."@Population" AS TargetPopulation,
+    a."@Advice" AS Advice,
+FROM AdviceRaw AS a;
 
 INSERT OR REPLACE INTO Reading
 SELECT DISTINCT ON (SCode, RDate, SpCode)

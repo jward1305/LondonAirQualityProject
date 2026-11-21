@@ -2,6 +2,7 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent
 JSON_DIR = ROOT_DIR / "json_dump"
+XML_DIR = ROOT_DIR / "xml_dump"
 LAP_API_URL = "http://api.erg.ic.ac.uk/AirQuality/"
 DUCKDB_DIR = ROOT_DIR/"duckdb"/"LAQ.duckdb"
 SQL_DIR = ROOT_DIR / "sql"

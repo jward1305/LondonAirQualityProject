@@ -16,7 +16,9 @@ CREATE TABLE IF NOT EXISTS SiteStaging (
 
 CREATE TABLE IF NOT EXISTS Species (
     SpCode VARCHAR PRIMARY KEY,
+    SpName VARCHAR,
     SpDescription VARCHAR,
+    SpHealthEffect VARCHAR,
 );
 
 CREATE TABLE IF NOT EXISTS AirQualityBand (

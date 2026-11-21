@@ -2,7 +2,7 @@
     "DailyAirQualityIndex": {
         "@MonitoringIndexDate": "2026-11-20 00:00:00",
         "@GroupName": "London",
-        "@TimeToLive": "16",
+        "@TimeToLive": "50",
         "LocalAuthority": [
             {
                 "@LocalAuthorityCode": "1",

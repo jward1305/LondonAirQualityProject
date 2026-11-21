@@ -1,10 +1,68 @@
 import duckdb as db
 
-from api import ROOT_DIR
-DUCKDB_DIR = ROOT_DIR/"duckdb"/"LAQ.duckdb"
-DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
-con = db.connect(str(DUCKDB_DIR))
+from config import DUCKDB_DIR, JSON_DIR, SQL_DIR, TEST_DATES
 
-query = f"SELECT unnest(LocalAuthority, max_depth := 2) FROM (SELECT unnest(DailyAirQualityIndex, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/DailyGroup.json'))"
-con.sql(query).show()
-con.close()
+def test_data(sqlRaw, sqlTables, sqlStaging):
+    latestFile = str(JSON_DIR / "*_Data.json")
+    con = db.connect(str(DUCKDB_DIR))
+    sqlRaw = sqlRaw.replace("JSON_FILE", latestFile)
+    con.execute(sqlRaw)
+    
+    #con.sql("SELECT * FROM DailyDataRaw").show()
+    
+    con.execute(sqlTables)
+    
+    con.execute(sqlStaging)
+    
+    #con.sql("SELECT * FROM LocalAuthorityStaging").show()
+    #con.sql("SELECT * FROM SiteStaging").show()
+    #con.sql("SELECT * FROM Species").show()
+    #con.sql("SELECT * FROM Reading").show()
+    
+    con.close()
+    print("Test data stored successfully.")
+    
+def latest_data(sqlRaw, sqlTables, sqlStaging):
+    latestFile = str(JSON_DIR / "DailyGroup.json")
+    con = db.connect(str(DUCKDB_DIR))
+    sqlRaw = sqlRaw.replace("JSON_FILE", latestFile)
+    con.execute(sqlRaw)
+    
+    #con.sql("SELECT * FROM DailyDataRaw").show()
+    #con.sql("SELECT * FROM SiteRaw").show()
+    #con.sql("SELECT * FROM SpeciesRaw").show()
+    
+    con.execute(sqlTables)
+    
+    con.execute(sqlStaging)
+    
+    #con.sql("SELECT * FROM LocalAuthorityStaging").show()
+    #con.sql("SELECT * FROM SiteStaging").show()
+    #con.sql("SELECT * FROM Species").show()
+    #con.sql("SELECT * FROM Reading").show()
+    
+    con.close()
+    print("Latest data stored successfully.")
+    
+
+def main():
+    DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
+    
+
+    fileRaw = SQL_DIR / "sqlRaw.sql"
+    sqlRaw = fileRaw.read_text()
+
+    fileTables = SQL_DIR / "sqlTables.sql"
+    sqlTables = fileTables.read_text()    
+    
+    fileStaging = SQL_DIR / "sqlStaging.sql"
+    sqlStaging = fileStaging.read_text()
+    
+    test_data(sqlRaw, sqlTables, sqlStaging)
+    latest_data(sqlRaw, sqlTables, sqlStaging)
+    
+
+    
+    
+if __name__ == "__main__":
+    main()

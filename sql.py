@@ -69,9 +69,12 @@ def main():
     fileStaging = SQL_DIR / "sqlStaging.sql"
     sqlStaging = fileStaging.read_text()
     
-    test_data(sqlRaw, sqlTables, sqlStaging)
-    latest_data(sqlRaw, sqlTables, sqlStaging)
+    #test_data(sqlRaw, sqlTables, sqlStaging)
+    #latest_data(sqlRaw, sqlTables, sqlStaging)
     
+    con = db.connect(str(DUCKDB_DIR))
+    con.sql("SELECT LAName FROM LocalAuthorityStaging").show(max_rows=33)
+    con.close()
 
     
     

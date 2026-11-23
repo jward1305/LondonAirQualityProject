@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS LocalAuthorityStaging (
     LACode INTEGER PRIMARY KEY,
     LAName VARCHAR,
-    LACentreLat FLOAT,
-    LACentreLong FLOAT,
+    LACentreLat DOUBLE,
+    LACentreLong DOUBLE,
 );
 
 CREATE TABLE IF NOT EXISTS SiteStaging (
@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS SiteStaging (
     LACode INTEGER,-- REFERENCES LocalAuthorityStaging(LACode),
     SName VARCHAR,
     SType VARCHAR,
-    SLat FLOAT,
-    SLong FLOAT,
+    SLat DOUBLE,
+    SLong DOUBLE,
 );
 
 CREATE TABLE IF NOT EXISTS Species (

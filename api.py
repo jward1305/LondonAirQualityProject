@@ -1,6 +1,6 @@
 import requests
 import json
-from config import JSON_DIR, LAP_API_URL, XML_DIR
+from config import JSON_DIR, LAP_API_URL, XML_DIR, TEST_DATES
 import xmltodict
 
 def dated_data_dump(date):
@@ -18,10 +18,9 @@ def latest_data_dump():
     response.raise_for_status()
     results = response.json()
     date = results["DailyAirQualityIndex"]["@MonitoringIndexDate"].split()[0]
-    with open(f"{JSON_DIR}/DailyGroup.json", "w") as f:
-        json.dump(results, f, indent=4)
-    print(f"Dumped latest daily data to json_dump/DailyGroup.json")
-    dated_data_dump(date)
+    with open(f"{JSON_DIR}/{date}_Data.json", "w") as f:
+            json.dump(results, f, indent=4)
+    print(f"Dumped latest daily data to json_dump/{date}_Data.json")
 
 def xml_data_dump():
     healthAdviceURL = f"{LAP_API_URL}Information/IndexHealthAdvice"
@@ -47,13 +46,34 @@ def xml_data_dump():
         json.dump(conversiondata, f, indent=4)
     print(f"Converted Species data to json_dump/Species.json")
 
+def site_dump():
+    sitesURL = "Information/MonitoringSites/GroupName=London/Json"
+    response = requests.get(f"{LAP_API_URL}{sitesURL}")
+    response.raise_for_status()
+    results = response.json()
+    with open(f"{JSON_DIR}/Sites.json", "w") as f:
+            json.dump(results, f, indent=4)
+    print(f"Dumped latest daily data to json_dump/Sites.json")
+
+def local_authority_dump():
+    localAuthorityURL = "Information/MonitoringLocalAuthority/GroupName=London/Json"
+    response = requests.get(f"{LAP_API_URL}{localAuthorityURL}")
+    response.raise_for_status()
+    results = response.json()
+    with open(f"{JSON_DIR}/LocalAuthority.json", "w") as f:
+            json.dump(results, f, indent=4)
+    print(f"Dumped latest daily data to json_dump/LocalAuthority.json")
+
 def main():
     JSON_DIR.mkdir(parents=True, exist_ok=True)
     XML_DIR.mkdir(parents=True, exist_ok=True)
-    #for date in TEST_DATES:
-    #    dated_data_dump(date)
-    #latest_data_dump()
+    #monitoringSitesURL = f"{LAP_API_URL}Information/MonitoringSites/GroupName=London"
+    for date in TEST_DATES:
+        dated_data_dump(date)
+    latest_data_dump()
     xml_data_dump()
+    local_authority_dump()
+    site_dump()
     print("Data dump complete.")
     
 if __name__ == "__main__":

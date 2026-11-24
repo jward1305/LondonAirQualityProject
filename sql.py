@@ -1,82 +1,32 @@
 import duckdb as db
+from config import JSON_DIR, DUCKDB_DIR, SQL_DIR
 
-from config import DUCKDB_DIR, JSON_DIR, SQL_DIR, TEST_DATES
+con = db.connect(str(DUCKDB_DIR))
+DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
+speciesFile = str(JSON_DIR / "Species.json")
+adviceFile = str(JSON_DIR / "IndexHealthAdvice.json")
+siteFile = str(JSON_DIR / "Sites.json")
+LAFile = str(JSON_DIR / "LocalAuthority.json")
+dailyFile = str(JSON_DIR / "*_Data.json")
 
-def test_data(sqlRaw, sqlTables, sqlStaging):
-    testFiles = str(JSON_DIR / "*_Data.json")
-    speciesFile = str(JSON_DIR / "Species.json")
-    adviceFile = str(JSON_DIR / "IndexHealthAdvice.json")
-    con = db.connect(str(DUCKDB_DIR))
-    sqlRaw = sqlRaw.replace("JSON_FILE", testFiles)
-    sqlRaw = sqlRaw.replace("SPECIES_FILE", speciesFile)
-    sqlRaw = sqlRaw.replace("ADVICE_FILE", adviceFile)
-    con.execute(sqlRaw)
-    
-    #con.sql("SELECT * FROM DailyDataRaw").show()
-    
-    con.execute(sqlTables)
-    
-    con.execute(sqlStaging)
-    
-    #con.sql("SELECT * FROM LocalAuthorityStaging").show()
-    #con.sql("SELECT * FROM SiteStaging").show()
-    #con.sql("SELECT * FROM Species").show()
-    #con.sql("SELECT * FROM Reading").show()
-    
-    con.close()
-    print("Test data stored successfully.")
-    
-def latest_data(sqlRaw, sqlTables, sqlStaging):
-    latestFile = str(JSON_DIR / "DailyGroup.json")
-    speciesFile = str(JSON_DIR / "Species.json")
-    adviceFile = str(JSON_DIR / "IndexHealthAdvice.json")
-    con = db.connect(str(DUCKDB_DIR))
-    sqlRaw = sqlRaw.replace("JSON_FILE", latestFile)
-    sqlRaw = sqlRaw.replace("SPECIES_FILE", speciesFile)
-    sqlRaw = sqlRaw.replace("ADVICE_FILE", adviceFile)
-    con.execute(sqlRaw)
-    
-    #con.sql("SELECT * FROM DailyDataRaw").show()
-    #con.sql("SELECT * FROM SiteRaw").show()
-    #con.sql("SELECT * FROM AdviceRaw").show()
-    
-    con.execute(sqlTables)
-    
-    con.execute(sqlStaging)
-    
-    #con.sql("SELECT * FROM LocalAuthorityStaging").show()
-    #con.sql("SELECT * FROM SiteStaging").show()
-    #con.sql("SELECT * FROM Species").show()
-    #con.sql("SELECT * FROM Reading").show()
-    #con.sql("SELECT * FROM Species").show()
-    #con.sql("SELECT * FROM Advice").show()
-    #con.sql("SELECT * FROM AirQualityBand").show()
-    
-    con.close()
-    print("Latest data stored successfully.")
-    
+fileRaw = SQL_DIR / "sqlRaw.sql"
+sqlRaw = fileRaw.read_text()
+sqlRaw = sqlRaw.replace("SPECIES_FILE", speciesFile)
+sqlRaw = sqlRaw.replace("ADVICE_FILE", adviceFile)
+sqlRaw = sqlRaw.replace("LOCAL_AUTHORITY_FILE", LAFile)
+sqlRaw = sqlRaw.replace("SITE_FILE", siteFile)
+sqlRaw = sqlRaw.replace("DAILY_DATA_FILE", dailyFile)
 
-def main():
-    DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
-    
+con.execute(sqlRaw)
 
-    fileRaw = SQL_DIR / "sqlRaw.sql"
-    sqlRaw = fileRaw.read_text()
+fileStage = SQL_DIR / "sqlStaging.sql"
+sqlStage = fileStage.read_text()
+con.execute(sqlStage)
 
-    fileTables = SQL_DIR / "sqlTables.sql"
-    sqlTables = fileTables.read_text()    
-    
-    fileStaging = SQL_DIR / "sqlStaging.sql"
-    sqlStaging = fileStaging.read_text()
-    
-    #test_data(sqlRaw, sqlTables, sqlStaging)
-    #latest_data(sqlRaw, sqlTables, sqlStaging)
-    
-    con = db.connect(str(DUCKDB_DIR))
-    con.sql("SELECT LAName FROM LocalAuthorityStaging").show(max_rows=33)
-    con.close()
-
-    
-    
-if __name__ == "__main__":
-    main()
+#con.sql("SELECT * FROM SiteRaw").show()
+#con.sql("SELECT * FROM LocalAuthorityRaw").show()
+#con.sql("SELECT * FROM AirQualityBandRaw").show()
+#con.sql("SELECT * FROM AdviceRaw").show()
+#con.sql("SELECT * FROM SpeciesRaw").show()
+con.sql("SELECT * FROM Reading").show()
+con.close()

@@ -9,6 +9,7 @@ siteFile = str(JSON_DIR / "Sites.json")
 LAFile = str(JSON_DIR / "LocalAuthority.json")
 dailyFile = str(JSON_DIR / "*_Data.json")
 
+'''
 fileRaw = SQL_DIR / "sqlRaw.sql"
 sqlRaw = fileRaw.read_text()
 sqlRaw = sqlRaw.replace("SPECIES_FILE", speciesFile)
@@ -29,4 +30,16 @@ con.execute(sqlStage)
 #con.sql("SELECT * FROM AdviceRaw").show()
 #con.sql("SELECT * FROM SpeciesRaw").show()
 con.sql("SELECT * FROM Reading").show()
+'''
+annualFile = str(JSON_DIR / '*_Site_Data.json')
+fileAnnual = SQL_DIR / "sqlAnnualRaw.sql"
+sqlAnnual = fileAnnual.read_text()
+sqlAnnual = sqlAnnual.replace('ANNUAL_FILE', annualFile)
+con.execute(sqlAnnual)
+
+fileTest = SQL_DIR / "sqlAnnualStaging.sql"
+sqltest = fileTest.read_text()
+con.execute(sqltest)
+con.sql("SELECT * FROM AnnualDataStaged").show()
+#con.sql("SELECT * FROM MonthlyDataStaged").show()
 con.close()

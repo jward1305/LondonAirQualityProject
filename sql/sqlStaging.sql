@@ -18,7 +18,8 @@ SELECT
     s."@SiteType" AS SType,
     TRY_CAST(s."@Latitude" AS DOUBLE) AS SLat,
     TRY_CAST(s."@Longitude" AS DOUBLE) AS SLong,
-    YEAR(TRY_CAST(NULLIF(s."@DateClosed", '') AS TIMESTAMP)) AS YearClosed
+    YEAR(TRY_CAST(NULLIF(s."@DateClosed", '') AS TIMESTAMP)) AS YearClosed,
+    YEAR(TRY_CAST(NULLIF(s."@DateOpened", '') AS TIMESTAMP)) AS YearOpened
 FROM SiteRaw AS s;
 
 CREATE OR REPLACE TABLE Species AS
